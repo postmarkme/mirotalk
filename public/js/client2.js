@@ -70,19 +70,6 @@ const chatInputEmoji = {
 
 let myPeerId; // socket.id
 
-// setup new button
-let eboocksBtn;
-eboocksBtn = getId('eboocksBtn');
-setTippy(eboocksBtn, 'Open eboocks', 'right-start');
-eboocksBtn.addEventListener('click', (e) => {
-    openURL('https://www.kidsa-z.com/', true);
-});
-  
-// hide not desidered buttons
-captionBtn.style.display = 'none';
-myHandBtn.style.display = 'none';
-fileShareBtn.style.display = 'none';
-
 // video cam - screen max frame rate
 let videoMaxFrameRate = 30;
 let screenMaxFrameRate = 30;
@@ -103,7 +90,6 @@ let peerGeo;
 let peerConnection;
 let myPeerName = getPeerName();
 let isScreenEnabled = getScreenEnabled();
-let isScreenSharingSupported = false;
 let notify = getNotify();
 let useAudio = true;
 let useVideo = true;
@@ -1405,7 +1391,7 @@ function loadLocalMedia(stream) {
  * Check if screen is shared on join room
  */
 function checkShareScreen() {
-    if (!isMobileDevice && isScreenEnabled && isScreenSharingSupported) {
+    if (!isMobileDevice && isScreenEnabled && (navigator.getDisplayMedia || navigator.mediaDevices.getDisplayMedia)) {
         playSound('newMessage');
         // screenShareBtn.click(); // Chrome - Opera - Edge - Brave
         // handle error: getDisplayMedia requires transient activation from a user gesture on Safari - FireFox
@@ -1976,7 +1962,6 @@ function setSwapCameraBtn() {
  */
 function setScreenShareBtn() {
     if (!isMobileDevice && (navigator.getDisplayMedia || navigator.mediaDevices.getDisplayMedia)) {
-        isScreenSharingSupported = true;
         screenShareBtn.addEventListener('click', (e) => {
             toggleScreenSharing();
         });
@@ -2654,17 +2639,17 @@ function gotDevices(deviceInfos) {
 
         switch (deviceInfo.kind) {
             case 'videoinput':
-                option.text = ` ` + deviceInfo.label || ` camera ${videoSelect.length + 1}`;
+                option.text = `📹 ` + deviceInfo.label || `📹 camera ${videoSelect.length + 1}`;
                 videoSelect.appendChild(option);
                 break;
 
             case 'audioinput':
-                option.text = ` ` + deviceInfo.label || ` microphone ${audioInputSelect.length + 1}`;
+                option.text = `🎤 ` + deviceInfo.label || `🎤 microphone ${audioInputSelect.length + 1}`;
                 audioInputSelect.appendChild(option);
                 break;
 
             case 'audiooutput':
-                option.text = ` ` + deviceInfo.label || ` speaker ${audioOutputSelect.length + 1}`;
+                option.text = `🔈 ` + deviceInfo.label || `🔈 speaker ${audioOutputSelect.length + 1}`;
                 audioOutputSelect.appendChild(option);
                 break;
 
@@ -2852,7 +2837,7 @@ function copyRoomURL() {
     navigator.clipboard.writeText(tmpInput.value);
     console.log('Copied to clipboard Join Link ', roomURL);
     document.body.removeChild(tmpInput);
-    userLog('toast', 'Meeting URL copied to clipboard ');
+    userLog('toast', 'Meeting URL copied to clipboard 👍');
 }
 
 /**
@@ -3120,7 +3105,7 @@ function startRecordingTime() {
     let rc = setInterval(function printTime() {
         if (isStreamRecording) {
             recElapsedTime = Date.now() - recStartTime;
-            myVideoParagraph.innerHTML = myPeerName + '&nbsp;&nbsp;  &nbsp; REC ' + getTimeToString(recElapsedTime);
+            myVideoParagraph.innerHTML = myPeerName + '&nbsp;&nbsp; 🔴 &nbsp; REC ' + getTimeToString(recElapsedTime);
             return;
         }
         clearInterval(rc);
@@ -3200,7 +3185,7 @@ function startStreamRecording() {
  * @param {string} action recording action
  */
 function notifyRecording(from, action) {
-    let msg = '[  REC ] : ' + action + ' to recording his own screen and audio';
+    let msg = '[ 🔴 REC ] : ' + action + ' to recording his own screen and audio';
     let chatMessage = {
         from: from,
         to: myPeerName,
@@ -3302,7 +3287,7 @@ function downloadRecordedStream() {
         userLog(
             'success-html',
             `<div style="text-align: left;">
-                 &nbsp; Recording Info <br/>
+                🔴 &nbsp; Recording Info <br/>
                 FILE: ${recFileName} <br/>
                 SIZE: ${blobFileSize} <br/>
                 Please wait to be processed, then will be downloaded to your ${currentDevice} device.
@@ -3634,7 +3619,7 @@ function msgerAddPeers(peers) {
                         id="${peer_id}_pMsgInput"
                         class="msger-input"
                         type="text"
-                        placeholder=" Enter your message..."
+                        placeholder="💬 Enter your message..."
                     />
                     <button id="${peer_id}_pMsgBtn" value="${peer_name}">
                         &nbsp;${peer_name}<i class="fas fa-paper-plane"></i>
@@ -4081,7 +4066,7 @@ function handlePeerPrivateMsg(peer_id, toPeerName) {
                     pMsg + '<br/><hr>Private message to ' + toPeerName,
                     true,
                 );
-                userLog('toast', 'Message sent to ' + toPeerName + ' ');
+                userLog('toast', 'Message sent to ' + toPeerName + ' 👍');
             }
         });
     };
@@ -4228,11 +4213,11 @@ function disableAllPeers(element) {
         if (result.isConfirmed) {
             switch (element) {
                 case 'audio':
-                    userLog('toast', 'Mute everyone ');
+                    userLog('toast', 'Mute everyone 👍');
                     emitPeersAction('muteAudio');
                     break;
                 case 'video':
-                    userLog('toast', 'Hide everyone ');
+                    userLog('toast', 'Hide everyone 👍');
                     emitPeersAction('hideVideo');
                     break;
             }
@@ -4272,11 +4257,11 @@ function disablePeer(peer_id, element) {
         if (result.isConfirmed) {
             switch (element) {
                 case 'audio':
-                    userLog('toast', 'Mute audio ');
+                    userLog('toast', 'Mute audio 👍');
                     emitPeerAction(peer_id, 'muteAudio');
                     break;
                 case 'video':
-                    userLog('toast', 'Hide video ');
+                    userLog('toast', 'Hide video 👍');
                     emitPeerAction(peer_id, 'hideVideo');
                     break;
             }
@@ -4304,7 +4289,7 @@ function lockUnlockRoom() {
  * Refresh Room Status (Locked/Unlocked)
  */
 function emitRoomStatus() {
-    let rStatus = roomLocked ? ' LOCKED the room, no one can access!' : ' UNLOCKED the room';
+    let rStatus = roomLocked ? '🔒 LOCKED the room, no one can access!' : '🔓 UNLOCKED the room';
     userLog('toast', rStatus);
 
     sendToServer('roomStatus', {
@@ -5653,16 +5638,3 @@ function getSl(selector) {
 function getEcN(className) {
     return document.getElementsByClassName(className);
 }
-
-// setup new button
-let eboocksBtn;
-eboocksBtn = getId('eboocksBtn');
-setTippy(eboocksBtn, 'Open eboocks', 'right-start');
-eboocksBtn.addEventListener('click', (e) => {
-    openURL('https://www.kidsa-z.com/', true);
-});
-  
-// hide not desidered buttons
-captionBtn.style.display = 'none';
-myHandBtn.style.display = 'none';
-fileShareBtn.style.display = 'none';
