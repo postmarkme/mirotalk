@@ -90,7 +90,6 @@ let peerGeo;
 let peerConnection;
 let myPeerName = getPeerName();
 let isScreenEnabled = getScreenEnabled();
-let isScreenSharingSupported = false;
 let notify = getNotify();
 let useAudio = true;
 let useVideo = true;
@@ -143,7 +142,6 @@ let fullScreenBtn;
 let chatRoomBtn;
 let captionBtn;
 let myHandBtn;
-let eboocksBtn;
 let whiteboardBtn;
 let fileShareBtn;
 let mySettingsBtn;
@@ -295,7 +293,6 @@ function getHtmlElementsById() {
     whiteboardBtn = getId('whiteboardBtn');
     fileShareBtn = getId('fileShareBtn');
     myHandBtn = getId('myHandBtn');
-    eboocksBtn = getId('eboocksBtn');
     mySettingsBtn = getId('mySettingsBtn');
     aboutBtn = getId('aboutBtn');
     leaveRoomBtn = getId('leaveRoomBtn');
@@ -412,7 +409,6 @@ function setButtonsToolTip() {
     setTippy(chatRoomBtn, 'OPEN the chat', 'right-start');
     setTippy(captionBtn, 'OPEN the caption', 'right-start');
     setTippy(myHandBtn, 'RAISE your hand', 'right-start');
-    setTippy(eboocksBtn, 'Open eboocks', 'right-start');
     setTippy(whiteboardBtn, 'OPEN the whiteboard', 'right-start');
     setTippy(fileShareBtn, 'SHARE file', 'right-start');
     setTippy(mySettingsBtn, 'SHOW settings', 'right-start');
@@ -1383,7 +1379,6 @@ function loadLocalMedia(stream) {
     getHtmlElementsById();
     setButtonsToolTip();
     manageLeftButtons();
-    hideLeftButtons();
     setupMySettings();
     setupVideoUrlPlayer();
     startCountTime();
@@ -1396,7 +1391,7 @@ function loadLocalMedia(stream) {
  * Check if screen is shared on join room
  */
 function checkShareScreen() {
-    if (!isMobileDevice && isScreenEnabled && isScreenSharingSupported) {
+    if (!isMobileDevice && isScreenEnabled && (navigator.getDisplayMedia || navigator.mediaDevices.getDisplayMedia)) {
         playSound('newMessage');
         // screenShareBtn.click(); // Chrome - Opera - Edge - Brave
         // handle error: getDisplayMedia requires transient activation from a user gesture on Safari - FireFox
@@ -1912,21 +1907,11 @@ function manageLeftButtons() {
     setCaptionRoomBtn();
     setChatEmojiBtn();
     setMyHandBtn();
-    setEboocksBtn();
     setMyWhiteboardBtn();
     setMyFileShareBtn();
     setMySettingsBtn();
     setAboutBtn();
     setLeaveRoomBtn();
-}
-
-/**
- * Hide nto desidered buttons
- */
-function hideLeftButtons() {
-    captionBtn.style.display = 'none';
-    myHandBtn.style.display = 'none';
-    fileShareBtn.style.display = 'none';
 }
 
 /**
@@ -1977,7 +1962,6 @@ function setSwapCameraBtn() {
  */
 function setScreenShareBtn() {
     if (!isMobileDevice && (navigator.getDisplayMedia || navigator.mediaDevices.getDisplayMedia)) {
-        isScreenSharingSupported = true;
         screenShareBtn.addEventListener('click', (e) => {
             toggleScreenSharing();
         });
@@ -2213,15 +2197,6 @@ function setChatEmojiBtn() {
 function setMyHandBtn() {
     myHandBtn.addEventListener('click', async (e) => {
         setMyHandStatus();
-    });
-}
-
-/**
- * Set Eboocks button click event
- */
-function setEboocksBtn() {
-    eboocksBtn.addEventListener('click', (e) => {
-        openURL('https://www.kidsa-z.com/', true);
     });
 }
 
