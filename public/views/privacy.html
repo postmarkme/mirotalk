@@ -12,7 +12,7 @@
 
         <!-- Title and Icon -->
 
-        <title>MiroTalk - Allow Video and Audio access to join in the Room.</title>
+        <title>MiroTalk - privacy policy.</title>
         <link rel="shortcut icon" href="../images/logo.svg" />
         <link rel="apple-touch-icon" href="../images/logo.svg" />
 
@@ -21,6 +21,15 @@
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <meta
+            name="description"
+            content="MiroTalk powered by WebRTC, Real-time secure video calls, chat and screen sharing capabilities in the browser, from your mobile or desktop"
+        />
+        <meta
+            name="keywords"
+            content="webrtc, RTCICECandidates, RTCSessionDescription, RTCDataChannel, real-time communications, webrtc stun, webrtc turn, video meeting, video chat, video conference, multi video chat, multi video conference, peer to peer, p2p, zoom, rtc, teams"
+        />
 
         <!-- https://ogp.me -->
 
@@ -31,8 +40,8 @@
             property="og:description"
             content="MiroTalk calling provides real-time HD quality and latency simply not available with traditional technology."
         />
-        <meta property="og:image" content="https://mirotalk.up.railway.app/images/preview.png" />
-        <meta property="og:url" content="https://mirotalk.herokuapp.com/" />
+        <meta property="og:image" content="https://p2p.mirotalk.com/images/preview.png" />
+        <meta property="og:url" content="https://p2p.mirotalk.org" />
 
         <!-- StyleSheet -->
 
@@ -52,37 +61,69 @@
                 </div>
             </header>
             <main class="site-content">
-                <section class="hero section illustration-section-01">
+                <section class="hero section">
                     <div class="container">
                         <div class="hero-inner section-inner">
                             <div class="split-wrap invert-mobile">
                                 <div class="split-item">
                                     <div class="hero-content split-item-content center-content-mobile">
                                         <h1 class="mt-0 mb-16 reveal-from-bottom" data-reveal-delay="150">
-                                            Access denied.
+                                            Privacy Policy
                                         </h1>
-                                        <p
-                                            id="getUserMediaError"
-                                            class="mt-0 mb-32 reveal-from-bottom"
-                                            data-reveal-delay="300"
-                                        ></p>
                                         <p class="mt-0 mb-32 reveal-from-bottom" data-reveal-delay="300">
-                                            This app will not work without camera/microphone access. Please try again
-                                            and allow it.
+                                            We limit ourselves to collect the smallest amount of user data that we need
+                                            in order to create a seamless experience when using
+                                            <strong>MiroTalk</strong>. <br /><br />
+                                            This data includes mainly:
+                                            <a
+                                                href="https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate"
+                                                target="_blank"
+                                                >RTCICECandidates</a
+                                            >
+                                            &
+                                            <a
+                                                href="https://developer.mozilla.org/en-US/docs/Web/API/RTCSessionDescription"
+                                                target="_blank"
+                                                >RTCSessionDescription</a
+                                            >
+                                            which is needed to establish the video call using WebRTC. RTCICECandidates,
+                                            RTCSessionDescription is not stored in any persistent database, it's removed
+                                            from the server as soon as the user leaves the call by closing the browser
+                                            window. The media streams are encrypted using Secure Real-time Transport
+                                            Protocol (SRTP).
+                                            <br /><br />
+                                            For Chat messaging and File Sharing, we using WebRTC's
+                                            <a
+                                                href="https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel"
+                                                target="_blank"
+                                                >RTCDataChannel</a
+                                            >
+                                            to transfer data directly from one peer to another. With RTCDataChannel, all
+                                            data is secured with
+                                            <a
+                                                href="https://en.wikipedia.org/wiki/Datagram_Transport_Layer_Security"
+                                                target="_blank"
+                                                >Datagram Transport Layer Security</a
+                                            >
+                                            (DTLS). DTLS is a derivative of SSL, meaning your data will be as secure as
+                                            using any standard SSL-based connection.
+                                            <br /><br />
+                                            If you record a meeting, the recording of the meeting is temporarily stored
+                                            on <strong>Your browser</strong>
+                                            <a
+                                                href="https://developer.mozilla.org/en-US/docs/Web/API/Blob"
+                                                target="_blank"
+                                                >Blob</a
+                                            >, then will be downloaded on Your PC/Mobile Device. <br /><br />
+                                            <strong>MiroTalk</strong> is purely peer-to-peer, which means the user's
+                                            video, audio, chat and file is not sent to our server at all. <br /><br />
+                                            We use Umami to track aggregated usage statistics in order to improve our
+                                            service. The maker of
+                                            <strong>MiroTalk</strong> has no intention of using personally or selling
+                                            any of the above-mentioned data.
                                         </p>
-                                        <script>
-                                            let qs = new URLSearchParams(window.location.search);
-                                            let roomId = qs.get('roomId');
-                                            let getUserMediaError = qs.get('getUserMediaError');
-                                            console.log('Allow Camera && Audio', {
-                                                roomId: roomId,
-                                                getUserMediaError: getUserMediaError,
-                                            });
-                                            // print getUserMedia error
-                                            document.getElementById('getUserMediaError').innerHTML = getUserMediaError;
-                                        </script>
                                         <div class="reveal-from-bottom" data-reveal-delay="450">
-                                            <button
+                                            <a
                                                 class="button button-primary button-wide-mobile pulse"
                                                 style="
                                                     border: 0;
@@ -93,10 +134,9 @@
                                                         #ffc55a 100%
                                                     );
                                                 "
-                                                onclick="roomId ? window.location.href = '/join/' + roomId : window.location.href = '/newcall';"
+                                                href="/newcall"
+                                                >AGREE</a
                                             >
-                                                Try again
-                                            </button>
                                         </div>
                                     </div>
                                     <style>
@@ -153,6 +193,22 @@
                                         </a>
                                     </li>
                                     <li>
+                                        <a target="_blank" href="https://www.youtube.com/watch?v=_IVn2aINYww">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="18"
+                                                height="18"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <title>YouTube</title>
+                                                <path
+                                                    d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.861-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"
+                                                    fill="#0270D7"
+                                                />
+                                            </svg>
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a target="_blank" href="mailto:miroslav.pejic.85@gmail.com">
                                             <svg
                                                 width="16"
@@ -168,6 +224,28 @@
                                             </svg>
                                         </a>
                                     </li>
+                                    <li>
+                                        <a
+                                            class="github-button"
+                                            href="https://github.com/sponsors/miroslavpejic85"
+                                            data-color-scheme="no-preference: light; light: light; dark: dark;"
+                                            data-icon="octicon-heart"
+                                            data-size="large"
+                                            aria-label="Sponsor @miroslavpejic85 on GitHub"
+                                            >Sponsor</a
+                                        >
+                                    </li>
+                                    <li>
+                                        <a
+                                            class="github-button"
+                                            href="https://github.com/miroslavpejic85/mirotalk"
+                                            data-color-scheme="no-preference: light; light: light; dark: dark;"
+                                            data-size="large"
+                                            data-show-count="true"
+                                            aria-label="Star miroslavpejic85/mirotalk on GitHub"
+                                            >Star</a
+                                        >
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -176,9 +254,6 @@
                                 <ul class="list-reset">
                                     <li>
                                         <a href="/about">About</a>
-                                    </li>
-                                    <li>
-                                        <a href="/privacy">Privacy Policy</a>
                                     </li>
                                     <li>
                                         <a target="_blank" href="https://www.linkedin.com/in/miroslav-pejic-976a07101/"
@@ -193,6 +268,8 @@
                 </div>
             </footer>
         </div>
+
         <script defer src="../js/landing.js"></script>
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
     </body>
 </html>

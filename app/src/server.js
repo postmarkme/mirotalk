@@ -8,15 +8,20 @@ http://patorjk.com/software/taag/#p=display&f=ANSI%20Regular&t=Server
 ███████ ███████ ██   ██   ████   ███████ ██   ██                                           
 
 dependencies: {
-    compression : https://www.npmjs.com/package/compression
-    cors        : https://www.npmjs.com/package/cors
-    dotenv      : https://www.npmjs.com/package/dotenv
-    express     : https://www.npmjs.com/package/express
-    ngrok       : https://www.npmjs.com/package/ngrok
-    socket.io   : https://www.npmjs.com/package/socket.io
-    swagger     : https://www.npmjs.com/package/swagger-ui-express
-    uuid        : https://www.npmjs.com/package/uuid
-    yamljs      : https://www.npmjs.com/package/yamljs
+    body-parser             : https://www.npmjs.com/package/body-parser
+    compression             : https://www.npmjs.com/package/compression
+    cors                    : https://www.npmjs.com/package/cors
+    crypto-js               : https://www.npmjs.com/package/crypto-js
+    dotenv                  : https://www.npmjs.com/package/dotenv
+    express                 : https://www.npmjs.com/package/express
+    ngrok                   : https://www.npmjs.com/package/ngrok
+    qs                      : https://www.npmjs.com/package/qs
+    @sentry/node            : https://www.npmjs.com/package/@sentry/node
+    @sentry/integrations    : https://www.npmjs.com/package/@sentry/integrations
+    socket.io               : https://www.npmjs.com/package/socket.io
+    swagger                 : https://www.npmjs.com/package/swagger-ui-express
+    uuid                    : https://www.npmjs.com/package/uuid
+    yamljs                  : https://www.npmjs.com/package/yamljs
 }
 */
 
@@ -24,7 +29,7 @@ dependencies: {
  * MiroTalk P2P - Server component
  *
  * @link    GitHub: https://github.com/miroslavpejic85/mirotalk
- * @link    Live demo: https://mirotalk.up.railway.app or https://mirotalk.herokuapp.com
+ * @link    Live demo: https://p2p.mirotalk.org or https://mirotalk.up.railway.app or https://mirotalk.herokuapp.com
  * @license For open source use: AGPLv3
  * @license For commercial or closed source, contact us at info.mirotalk@gmail.com
  * @author  Miroslav Pejic - miroslav.pejic.85@gmail.com
@@ -71,6 +76,7 @@ if (isHttps) {
 */
 io = new Server({
     maxHttpBufferSize: 1e7,
+    transports: ['websocket'],
 }).listen(server);
 
 // console.log(io);
@@ -88,28 +94,60 @@ const api_key_secret = process.env.API_KEY_SECRET || 'mirotalk_default_secret';
 
 // Ngrok config
 const ngrok = require('ngrok');
-const ngrokEnabled = process.env.NGROK_ENABLED;
+const ngrokEnabled = process.env.NGROK_ENABLED || false;
 const ngrokAuthToken = process.env.NGROK_AUTH_TOKEN;
 
 // Turn config
-const turnEnabled = process.env.TURN_ENABLED;
+const turnEnabled = process.env.TURN_ENABLED || false;
 const turnUrls = process.env.TURN_URLS;
 const turnUsername = process.env.TURN_USERNAME;
 const turnCredential = process.env.TURN_PASSWORD;
+
+// Sentry config
+const Sentry = require('@sentry/node');
+const { CaptureConsole } = require('@sentry/integrations');
+const sentryEnabled = process.env.SENTRY_ENABLED || false;
+const sentryDSN = process.env.SENTRY_DSN;
+const sentryTracesSampleRate = process.env.SENTRY_TRACES_SAMPLE_RATE;
+
+// Slack API
+const CryptoJS = require('crypto-js');
+const qS = require('qs');
+const slackEnabled = process.env.SENTRY_ENABLED || false;
+const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
+const bodyParser = require('body-parser');
+
+// Setup sentry client
+if (sentryEnabled == 'true') {
+    Sentry.init({
+        dsn: sentryDSN,
+        integrations: [
+            new CaptureConsole({
+                // array of methods that should be captured
+                // defaults to ['log', 'info', 'warn', 'error', 'debug', 'assert']
+                levels: ['warn', 'error'],
+            }),
+        ],
+        // Set tracesSampleRate to 1.0 to capture 100%
+        // of transactions for performance monitoring.
+        // We recommend adjusting this value in production
+        tracesSampleRate: sentryTracesSampleRate,
+    });
+}
 
 // directory
 const dir = {
     public: path.join(__dirname, '../../', 'public'),
 };
 // html views
-const view = {
-    about: path.join(__dirname, '../../', 'public/view/about.html'),
-    client: path.join(__dirname, '../../', 'public/view/client.html'),
-    landing: path.join(__dirname, '../../', 'public/view/landing.html'),
-    newCall: path.join(__dirname, '../../', 'public/view/newcall.html'),
-    notFound: path.join(__dirname, '../../', 'public/view/404.html'),
-    permission: path.join(__dirname, '../../', 'public/view/permission.html'),
-    privacy: path.join(__dirname, '../../', 'public/view/privacy.html'),
+const views = {
+    about: path.join(__dirname, '../../', 'public/views/about.html'),
+    client: path.join(__dirname, '../../', 'public/views/client.html'),
+    landing: path.join(__dirname, '../../', 'public/views/landing.html'),
+    newCall: path.join(__dirname, '../../', 'public/views/newcall.html'),
+    notFound: path.join(__dirname, '../../', 'public/views/404.html'),
+    permission: path.join(__dirname, '../../', 'public/views/permission.html'),
+    privacy: path.join(__dirname, '../../', 'public/views/privacy.html'),
 };
 
 let channels = {}; // collect channels
@@ -120,6 +158,7 @@ app.use(cors()); // Enable All CORS Requests for all origins
 app.use(compression()); // Compress all HTTP responses using GZip
 app.use(express.json()); // Api parse body data as json
 app.use(express.static(dir.public)); // Use all static files from the public folder
+app.use(bodyParser.urlencoded({ extended: true })); // Need for Slack API body parser
 
 // Remove trailing slashes in url handle bad requests
 app.use((err, req, res, next) => {
@@ -141,27 +180,27 @@ app.use((err, req, res, next) => {
 
 // all start from here
 app.get(['/'], (req, res) => {
-    res.sendFile(view.landing);
+    res.sendFile(views.landing);
 });
 
 // mirotalk about
 app.get(['/about'], (req, res) => {
-    res.sendFile(view.about);
+    res.sendFile(views.about);
 });
 
 // set new room name and join
 app.get(['/newcall'], (req, res) => {
-    res.sendFile(view.newCall);
+    res.sendFile(views.newCall);
 });
 
 // if not allow video/audio
 app.get(['/permission'], (req, res) => {
-    res.sendFile(view.permission);
+    res.sendFile(views.permission);
 });
 
 // privacy policy
 app.get(['/privacy'], (req, res) => {
-    res.sendFile(view.privacy);
+    res.sendFile(views.privacy);
 });
 
 // no room name specified to join
@@ -173,15 +212,10 @@ app.get('/join/', (req, res) => {
             https://mirotalk.up.railway.app/join?room=test&name=mirotalk&audio=1&video=1&screen=1&notify=1
             https://mirotalk.herokuapp.com/join?room=test&name=mirotalk&audio=1&video=1&screen=1&notify=1
         */
-        let roomName = req.query.room;
-        let peerName = req.query.name;
-        let peerAudio = req.query.audio;
-        let peerVideo = req.query.video;
-        let peerScreen = req.query.screen;
-        let notify = req.query.notify;
+        const { room, name, audio, video, screen, notify } = req.query;
         // all the params are mandatory for the direct room join
-        if (roomName && peerName && peerAudio && peerVideo && peerScreen && notify) {
-            return res.sendFile(view.client);
+        if (room && name && audio && video && screen && notify) {
+            return res.sendFile(views.client);
         }
     }
     res.redirect('/');
@@ -189,7 +223,7 @@ app.get('/join/', (req, res) => {
 
 // Join Room *
 app.get('/join/*', (req, res) => {
-    res.sendFile(view.client);
+    res.sendFile(views.client);
 });
 
 /**
@@ -225,6 +259,42 @@ app.post([apiBasePath + '/meeting'], (req, res) => {
     });
 });
 
+/*
+    MiroTalk Slack app v1
+    https://api.slack.com/authentication/verifying-requests-from-slack
+*/
+
+//Slack request meeting room endpoint
+app.post('/slack', (req, res) => {
+    if (slackEnabled != 'true') return res.end('`Under maintenance` - Please check back soon.');
+
+    log.debug('Slack', req.headers);
+
+    if (!slackSigningSecret) return res.end('`Slack Signing Secret is empty!`');
+
+    let slackSignature = req.headers['x-slack-signature'];
+    let requestBody = qS.stringify(req.body, { format: 'RFC1738' });
+    let timeStamp = req.headers['x-slack-request-timestamp'];
+    let time = Math.floor(new Date().getTime() / 1000);
+
+    // The request timestamp is more than five minutes from local time. It could be a replay attack, so let's ignore it.
+    if (Math.abs(time - timeStamp) > 300) return res.end('`Wrong timestamp` - Ignore this request.');
+
+    // Get Signature to compare it later
+    let sigBaseString = 'v0:' + timeStamp + ':' + requestBody;
+    let mySignature = 'v0=' + CryptoJS.HmacSHA256(sigBaseString, slackSigningSecret);
+
+    // Valid Signature return a meetingURL
+    if (mySignature == slackSignature) {
+        let host = req.headers.host;
+        let meetingURL = getMeetingURL(host);
+        log.debug('Slack', { meeting: meetingURL });
+        return res.end(meetingURL);
+    }
+    // Something wrong
+    return res.end('`Wrong signature` - Verification failed!');
+});
+
 /**
  * Request meeting room endpoint
  * @returns  entrypoint / Room URL for your meeting.
@@ -237,16 +307,16 @@ function getMeetingURL(host) {
 
 // not match any of page before, so 404 not found
 app.get('*', function (req, res) {
-    res.sendFile(view.notFound);
+    res.sendFile(views.notFound);
 });
 
 /**
  * You should probably use a different stun-turn server
  * doing commercial stuff, also see:
  *
+ * https://github.com/coturn/coturn
  * https://gist.github.com/zziuni/3741933
  * https://www.twilio.com/docs/stun-turn
- * https://github.com/coturn/coturn
  *
  * Check the functionality of STUN/TURN servers:
  * https://webrtc.github.io/samples/src/content/peerconnection/trickle-ice/
@@ -265,25 +335,15 @@ if (turnEnabled == 'true') {
         },
     );
 } else {
-    // Thanks to https://www.metered.ca/tools/openrelay/
+    // My own As backup if not configured, please configure your in the .env file
     iceServers.push(
         {
-            urls: 'stun:openrelay.metered.ca:80',
+            urls: 'stun:stun.l.google.com:19302',
         },
         {
-            urls: 'turn:openrelay.metered.ca:80',
-            username: 'openrelayproject',
-            credential: 'openrelayproject',
-        },
-        {
-            urls: 'turn:openrelay.metered.ca:443',
-            username: 'openrelayproject',
-            credential: 'openrelayproject',
-        },
-        {
-            urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-            username: 'openrelayproject',
-            credential: 'openrelayproject',
+            urls: 'turn:numb.viagenie.ca',
+            username: 'miroslav.pejic.85@gmail.com',
+            credential: 'mirotalkp2p',
         },
     );
 }
@@ -312,10 +372,11 @@ async function ngrokStart() {
             server_tunnel: tunnelHttps,
             api_docs: api_docs,
             api_key_secret: api_key_secret,
+            sentry_enabled: sentryEnabled,
             node_version: process.versions.node,
         });
     } catch (err) {
-        log.error('[Error] ngrokStart', err.body);
+        log.warn('[Error] ngrokStart', err.body);
         process.exit(1);
     }
 }
@@ -348,6 +409,7 @@ server.listen(port, null, () => {
             server: host,
             api_docs: api_docs,
             api_key_secret: api_key_secret,
+            sentry_enabled: sentryEnabled,
             node_version: process.versions.node,
         });
     }
@@ -370,6 +432,17 @@ io.sockets.on('connect', (socket) => {
     socket.channels = {};
     sockets[socket.id] = socket;
 
+    const transport = socket.conn.transport.name; // in most cases, "polling"
+    log.debug('[' + socket.id + '] Connection transport', transport);
+
+    /**
+     * Check upgrade transport
+     */
+    socket.conn.on('upgrade', () => {
+        const upgradedTransport = socket.conn.transport.name; // in most cases, "websocket"
+        log.debug('[' + socket.id + '] Connection upgraded transport', upgradedTransport);
+    });
+
     /**
      * On peer diconnected
      */
@@ -388,6 +461,7 @@ io.sockets.on('connect', (socket) => {
         log.debug('[' + socket.id + '] join ', config);
 
         let channel = config.channel;
+        let channel_password = config.channel_password;
         let peer_name = config.peer_name;
         let peer_video = config.peer_video;
         let peer_audio = config.peer_audio;
@@ -405,7 +479,7 @@ io.sockets.on('connect', (socket) => {
         if (!(channel in peers)) peers[channel] = {};
 
         // room locked by the participants can't join
-        if (peers[channel]['Locked'] === true) {
+        if (peers[channel]['lock'] === true && peers[channel]['password'] != channel_password) {
             log.debug('[' + socket.id + '] [Warning] Room Is Locked', channel);
             socket.emit('roomIsLocked');
             return;
@@ -463,20 +537,18 @@ io.sockets.on('connect', (socket) => {
             log.debug('[' + socket.id + '] [Warning] not in ', channel);
             return;
         }
-
-        delete socket.channels[channel];
-        delete channels[channel][socket.id];
-        delete peers[channel][socket.id];
-
-        switch (Object.keys(peers[channel]).length) {
-            case 0:
-                // last peer disconnected from the room without room status set, delete room data
-                delete peers[channel];
-                break;
-            case 1:
-                // last peer disconnected from the room having room status set, delete room data
-                if ('Locked' in peers[channel]) delete peers[channel];
-                break;
+        try {
+            delete socket.channels[channel];
+            delete channels[channel][socket.id];
+            delete peers[channel][socket.id]; // delete peer data from the room
+            switch (Object.keys(peers[channel]).length) {
+                case 0: // last peer disconnected from the room without room lock & password set
+                case 2: // last peer disconnected from the room having room lock & password set
+                    delete peers[channel]; // clean lock and password value from the room
+                    break;
+            }
+        } catch (err) {
+            log.error('Remove Peer', toJson(err));
         }
         log.debug('connected peers grp by roomId', peers);
 
@@ -522,21 +594,48 @@ io.sockets.on('connect', (socket) => {
     });
 
     /**
-     * Refresh Room Status (Locked/Unlocked)
+     * Handle Room action
      */
-    socket.on('roomStatus', (config) => {
+    socket.on('roomAction', (config) => {
+        //log.debug('[' + socket.id + '] Room action:', config);
+        let room_is_locked = false;
         let room_id = config.room_id;
-        let room_locked = config.room_locked;
         let peer_name = config.peer_name;
-
-        peers[room_id]['Locked'] = room_locked;
-
-        log.debug('[' + socket.id + '] emit roomStatus' + ' to [room_id: ' + room_id + ' locked: ' + room_locked + ']');
-
-        sendToRoom(room_id, socket.id, 'roomStatus', {
-            peer_name: peer_name,
-            room_locked: room_locked,
-        });
+        let password = config.password;
+        let action = config.action;
+        //
+        try {
+            switch (action) {
+                case 'lock':
+                    peers[room_id]['lock'] = true;
+                    peers[room_id]['password'] = password;
+                    sendToRoom(room_id, socket.id, 'roomAction', {
+                        peer_name: peer_name,
+                        action: action,
+                    });
+                    room_is_locked = true;
+                    break;
+                case 'unlock':
+                    delete peers[room_id]['lock'];
+                    delete peers[room_id]['password'];
+                    sendToRoom(room_id, socket.id, 'roomAction', {
+                        peer_name: peer_name,
+                        action: action,
+                    });
+                    break;
+                case 'checkPassword':
+                    let config = {
+                        peer_name: peer_name,
+                        action: action,
+                        password: password == peers[room_id]['password'] ? 'OK' : 'KO',
+                    };
+                    sendToPeer(socket.id, sockets, 'roomAction', config);
+                    break;
+            }
+        } catch (err) {
+            log.error('Room action', toJson(err));
+        }
+        log.debug('[' + socket.id + '] Room ' + room_id, { locked: room_is_locked, password: password });
     });
 
     /**
@@ -576,38 +675,41 @@ io.sockets.on('connect', (socket) => {
         let peer_name = config.peer_name;
         let element = config.element;
         let status = config.status;
-
-        for (let peer_id in peers[room_id]) {
-            if (peers[room_id][peer_id]['peer_name'] == peer_name) {
-                switch (element) {
-                    case 'video':
-                        peers[room_id][peer_id]['peer_video'] = status;
-                        break;
-                    case 'audio':
-                        peers[room_id][peer_id]['peer_audio'] = status;
-                        break;
-                    case 'hand':
-                        peers[room_id][peer_id]['peer_hand'] = status;
-                        break;
-                    case 'rec':
-                        peers[room_id][peer_id]['peer_rec'] = status;
-                        break;
+        try {
+            for (let peer_id in peers[room_id]) {
+                if (peers[room_id][peer_id]['peer_name'] == peer_name) {
+                    switch (element) {
+                        case 'video':
+                            peers[room_id][peer_id]['peer_video'] = status;
+                            break;
+                        case 'audio':
+                            peers[room_id][peer_id]['peer_audio'] = status;
+                            break;
+                        case 'hand':
+                            peers[room_id][peer_id]['peer_hand'] = status;
+                            break;
+                        case 'rec':
+                            peers[room_id][peer_id]['peer_rec'] = status;
+                            break;
+                    }
                 }
             }
+
+            log.debug('[' + socket.id + '] emit peerStatus to [room_id: ' + room_id + ']', {
+                peer_id: socket.id,
+                element: element,
+                status: status,
+            });
+
+            sendToRoom(room_id, socket.id, 'peerStatus', {
+                peer_id: socket.id,
+                peer_name: peer_name,
+                element: element,
+                status: status,
+            });
+        } catch (err) {
+            log.error('Peer Status', toJson(err));
         }
-
-        log.debug('[' + socket.id + '] emit peerStatus to [room_id: ' + room_id + ']', {
-            peer_id: socket.id,
-            element: element,
-            status: status,
-        });
-
-        sendToRoom(room_id, socket.id, 'peerStatus', {
-            peer_id: socket.id,
-            peer_name: peer_name,
-            element: element,
-            status: status,
-        });
     });
 
     /**
@@ -661,6 +763,8 @@ io.sockets.on('connect', (socket) => {
     socket.on('fileInfo', (config) => {
         let room_id = config.room_id;
         let peer_name = config.peer_name;
+        let peer_id = config.peer_id;
+        let broadcast = config.broadcast;
         let file = config.file;
 
         function bytesToSize(bytes) {
@@ -677,9 +781,14 @@ io.sockets.on('connect', (socket) => {
             fileName: file.fileName,
             fileSize: bytesToSize(file.fileSize),
             fileType: file.fileType,
+            broadcast: broadcast,
         });
 
-        sendToRoom(room_id, socket.id, 'fileInfo', file);
+        if (broadcast) {
+            sendToRoom(room_id, socket.id, 'fileInfo', file);
+        } else {
+            sendToPeer(peer_id, sockets, 'fileInfo', file);
+        }
     });
 
     /**
@@ -723,7 +832,7 @@ io.sockets.on('connect', (socket) => {
 
             sendToPeer(peer_id, sockets, 'videoPlayer', sendConfig);
         } else {
-            log.debug('[' + socket.id + '] emit videoPlayer to [room_id: ' + room_id + ']', logme);
+            log.debug('[' + socket.id + '] emit videoPlayer to [room_id: ' + room_id + ']', logMe);
 
             sendToRoom(room_id, socket.id, 'videoPlayer', sendConfig);
         }
@@ -744,6 +853,15 @@ io.sockets.on('connect', (socket) => {
         sendToRoom(room_id, socket.id, 'whiteboardAction', config);
     });
 }); // end [sockets.on-connect]
+
+/**
+ * Object to Json
+ * @param {object} data object
+ * @returns {json} indent 4 spaces
+ */
+function toJson(data) {
+    return JSON.stringify(data, null, 4); // "\t"
+}
 
 /**
  * Send async data to all peers in the same room except yourself

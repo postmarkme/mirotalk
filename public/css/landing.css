@@ -22,7 +22,6 @@ section {
 h1 {
     font-size: 2em;
     margin: 0.67em 0;
-    color: #3395FF;
 }
 
 figcaption,
@@ -293,8 +292,8 @@ html {
 }
 
 body {
-    background: #ffffff;
-  /*  background: linear-gradient(to left, #171717, #000000); */
+    /* background: #16171b; */
+    background: linear-gradient(to left, #171717, #000000);
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
 }
@@ -446,10 +445,10 @@ h6,
 .h4,
 .h5,
 .h6 {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Fira Sans', sans-serif;
     font-weight: 600;
     clear: both;
-    color: #0071EC;
+    color: #f9faff;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
@@ -571,7 +570,6 @@ h6,
 p {
     margin-top: 0;
     margin-bottom: 24px;
-    color: #4A4B4C;
 }
 
 dfn,
@@ -2653,11 +2651,11 @@ ul.pricing-item-features-list li {
     position: absolute;
     width: 100%;
     max-width: 100%;
-    height: 2000px;
+    height: 1980px;
     /*background-image: url(../images/illustration-section-01.svg);*/
-    background-image: url(../images/bg6.png);
+    background-image: url(../images/bg.svg);
     background-repeat: no-repeat;
-    background-size: 100%;
+    background-size: auto;
     left: 50%;
     top: 0;
     background-position: center top;
@@ -3194,7 +3192,6 @@ img.has-shadow {
 
 .p-0 {
     padding: 0;
-    color: #4A4B4C;
 }
 
 .pt-0 {

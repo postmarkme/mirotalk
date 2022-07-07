@@ -38,8 +38,8 @@
         <meta property="og:site_name" content="MiroTalk" />
         <meta property="og:title" content="Click the link to join this call." />
         <meta property="og:description" content="Free WebRTC browser-based video call." />
-        <meta property="og:image" content="https://mirotalk.up.railway.app/images/preview.png" />
-        <meta property="og:url" content="https://mirotalk.herokuapp.com/" />
+        <meta property="og:image" content="https://p2p.mirotalk.com/images/preview.png" />
+        <meta property="og:url" content="https://p2p.mirotalk.org" />
         <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon.png" />
 
         <!-- StyleSheet -->
@@ -84,7 +84,7 @@ access to use this app.
             <button id="shareRoomBtn" class="fas fa-users"></button>
             <button id="audioBtn" class="fas fa-microphone"></button>
             <button id="videoBtn" class="fas fa-video"></button>
-            <button id="swapCameraBtn" class="fas fa-sync-alt"></button>
+            <button id="swapCameraBtn" class="fas fa-camera-rotate"></button>
             <button id="screenShareBtn" class="fas fa-desktop"></button>
             <button id="recordStreamBtn" class="fas fa-record-vinyl"></button>
             <button id="fullScreenBtn" class="fas fa-expand-alt"></button>
@@ -95,7 +95,7 @@ access to use this app.
             <button id="fileShareBtn" class="fas fa-folder-open"></button>
             <button id="mySettingsBtn" class="fas fa-cogs"></button>
             <button id="aboutBtn" class="fas fa-question"></button>
-            <button id="leaveRoomBtn" class="fas fa-phone-slash"></button>
+            <button id="leaveRoomBtn" class="fas fa-right-from-bracket"></button>
         </div>
         <!-- End left buttons -->
 
@@ -110,8 +110,8 @@ access to use this app.
                     <div class="msger-header-title"><button id="msgerClose" class="fas fa-times"></button></div>
                     <div class="msger-header-options">
                         <button id="msgerTheme" class="fas fa-ghost"></button>
-                        <button id="msgerClean" class="fas fa-trash"></button>
                         <button id="msgerSaveBtn" class="fas fa-save"></button>
+                        <button id="msgerClean" class="fas fa-trash"></button>
                     </div>
                 </header>
 
@@ -129,8 +129,8 @@ access to use this app.
                 <!-- End emoji picker -->
 
                 <div class="msger-inputarea">
-                    <button id="msgerEmojiBtn" class="fas fa-smile"></button>
                     <input id="msgerInput" class="msger-input" type="text" placeholder="💬 Enter your message..." />
+                    <button id="msgerEmojiBtn" class="fas fa-smile"></button>
                     <button id="msgerVideoUrlBtn" class="fab fa-youtube"></button>
                     <button id="msgerCPBtn" class="fas fa-users"></button>
                     <button id="msgerSendBtn" class="fas fa-paper-plane"></button>
@@ -178,8 +178,8 @@ access to use this app.
                     </div>
                     <div class="msger-header-options">
                         <button id="captionTheme" class="fas fa-ghost"></button>
-                        <button id="captionClean" class="fas fa-trash"></button>
                         <button id="captionSaveBtn" class="fas fa-save"></button>
+                        <button id="captionClean" class="fas fa-trash"></button>
                     </div>
                 </header>
 
@@ -209,6 +209,7 @@ access to use this app.
                     <button id="tabBandwidthBtn" class="fas fa-wifi tablinks"></button>
                     <button id="tabRoomBtn" class="fas fa-home tablinks"></button>
                     <button id="tabStylingBtn" class="fas fa-palette tablinks"></button>
+                    <button id="tabLanguagesBtn" class="fas fa-globe tablinks"></button>
                 </div>
 
                 <div id="tabDevices" class="tabcontent">
@@ -239,6 +240,7 @@ access to use this app.
                         <option value="vgaVideo">VGA</option>
                         <option value="hdVideo">HD</option>
                         <option value="fhdVideo">FULL HD</option>
+                        <option value="2kVideo">2k</option>
                         <option value="4kVideo">4K</option>
                     </select>
                     <br /><br />
@@ -282,9 +284,8 @@ access to use this app.
                         <button id="hideEveryoneBtn"><i class="fas fa-video"></i>&nbsp;Hide everyone</button>
                         <br /><br />
                         <label>Security</label><br />
-                        <button id="lockUnlockRoomBtn">
-                            <i id="lockUnlockRoomIco" class="fas fa-lock-open"></i>&nbsp;Lock/unlock room
-                        </button>
+                        <button id="lockRoomBtn"><i class="fas fa-lock-open"></i>&nbsp;Lock room</button>
+                        <button id="unlockRoomBtn" class="hidden"><i class="fas fa-lock"></i>&nbsp;Unlock room</button>
                     </div>
                 </div>
 
@@ -313,6 +314,11 @@ access to use this app.
                         <option value="vertical">🚦 Vertical</option>
                         <option value="horizontal">🚥 Horizontal</option>
                     </select>
+                </div>
+
+                <div id="tabLanguages" class="tabcontent">
+                    <br />
+                    <div id="google_translate_element"></div>
                 </div>
             </main>
         </section>
@@ -424,5 +430,19 @@ access to use this app.
 		the <video> and <audio> tags are all added and removed dynamically
 		in 'onAddStream', 'setupLocalMedia', and 'removePeer'/'disconnect'
 		-->
+
+        <!-- 
+            Start Google Translate 
+            https://www.w3schools.com/howto/howto_google_translate.asp
+        -->
+
+        <script>
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({ pageLanguage: 'en' }, 'google_translate_element');
+            }
+        </script>
+        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+        <!-- End Google Translate -->
     </body>
 </html>

@@ -5,9 +5,13 @@
 <hr />
 
 <p align="center">
-<a href="https://mirotalk.up.railway.app/" >
-    <img src="public/images/mirotalk-header.gif" />
-</a>
+    <a href="https://p2p.mirotalk.com">p2p.mirotalk.com</a>
+</p>
+
+<hr />
+
+<p align="center">
+    <a href="https://p2p.mirotalk.com"><img src="public/images/mirotalk-header.gif"></a>
 </p>
 
 <hr />
@@ -20,13 +24,14 @@
 -   Is `100% Free` - `Open Source` - `Self Hosted`
 -   No download, plug-in, or login required, entirely browser-based
 -   Unlimited number of conference rooms without call time limitation
--   Possibility to Lock/Unlock the Room for the meeting
+-   Translated in 133 languages
+-   Possibility to Password protect the Room for the meeting
 -   Desktop and Mobile compatible
 -   Optimized Room URL Sharing (share it to your participants, wait for them to join)
 -   Webcam Streaming (Front - Rear for mobile)
--   Audio Streaming crystal clear + detect speacking and indicator
+-   Audio Streaming crystal clear with detect speaking and volume indicator
 -   Screen Sharing to present documents, slides, and more...
--   File Sharing, share any files to your participants in the room
+-   File Sharing (with drag-and-drop), share any files to your participants in the room
 -   Select Audio Input - Output && Video source
 -   Ability to set video quality up to 4K and 60 FPS
 -   Recording your Screen, Audio and Video
@@ -40,6 +45,8 @@
 -   Right-click on the Video elements for more options
 -   Direct `peer-to-peer` connection ensures the lowest latency thanks to `WebRTC`
 -   Supports [REST API](app/api/README.md) (Application Programming Interface)
+-   [Slack](https://api.slack.com/apps/) API integration
+-   [Sentry](https://sentry.io/) error reporting
 
 </details>
 
@@ -57,7 +64,9 @@
 
 <br/>
 
--   `Open` https://mirotalk.up.railway.app/newcall or https://mirotalk.herokuapp.com/newcall
+-   `Open` https://p2p.mirotalk.com/newcall or
+-   https://mirotalk.up.railway.app/newcall or
+-   https://mirotalk.herokuapp.com/newcall
 -   `Pick` your Room name and Join
 -   `Allow` using the camera and microphone
 -   `Share` the Room URL and Wait for someone to join for the video conference
@@ -70,6 +79,7 @@
 <br/>
 
 -   You can `join` directly to `room` by going to:
+-   https://p2p.mirotalk.com/join?room=test&name=mirotalk&audio=0&video=0&screen=0&notify=0
 -   https://mirotalk.up.railway.app/join?room=test&name=mirotalk&audio=0&video=0&screen=0&notify=0
 -   https://mirotalk.herokuapp.com/join?room=test&name=mirotalk&audio=0&video=0&screen=0&notify=0
 
@@ -94,7 +104,7 @@ Embedding a meeting into a service or app using an iframe.
 ```html
 <iframe
     allow="camera; microphone; fullscreen; display-capture; autoplay"
-    src="https://mirotalk.up.railway.app/newcall"
+    src="https://mirotalk.herokuapp.com/newcall"
     style="height: 100%; width: 100%; border: 0px;"
 ></iframe>
 ```
@@ -149,11 +159,11 @@ $ docker-compose down
 </details>
 
 <details>
-<summary>Https</summary>
+<summary>Ngrok - Https</summary>
 
 <br/>
 
-You can start videoconferencing directly from your Local PC, and be reachable from any device outside your network, simply using a service like [ngrok](https://ngrok.com/) by editing the [Ngrok part](https://github.com/miroslavpejic85/mirotalk/blob/master/.env.template#L1) on `.env` file, or expose it directly on [HTTPS](app/ssl/README.md)
+You can start videoconferencing directly from your Local PC, and be reachable from any device outside your network, simply by following [these documentation](docs/ngrok.md), or expose it directly on [HTTPS](app/ssl/README.md)
 
 </details>
 
@@ -174,36 +184,67 @@ You can start videoconferencing directly from your Local PC, and be reachable fr
 ```bash
 # The response will give you a entrypoint / Room URL for your meeting, where authorization: API_KEY_SECRET.
 $ curl -X POST "http://localhost:3000/api/v1/meeting" -H "authorization: mirotalk_default_secret" -H "Content-Type: application/json"
+$ curl -X POST "https://p2p.mirotalk.com/api/v1/meeting" -H "authorization: mirotalk_default_secret" -H "Content-Type: application/json"
 $ curl -X POST "https://mirotalk.up.railway.app/api/v1/meeting" -H "authorization: mirotalk_default_secret" -H "Content-Type: application/json"
 $ curl -X POST "https://mirotalk.herokuapp.com/api/v1/meeting" -H "authorization: mirotalk_default_secret" -H "Content-Type: application/json"
 ```
 
 ## API Documentation
 
-The API documentation uses [swagger](https://swagger.io/) at http://localhost:3000/api/v1/docs. Or check it out on [railway](https://mirotalk.up.railway.app/api/v1/docs) & [heroku](https://mirotalk.herokuapp.com/api/v1/docs).
+The API documentation uses [swagger](https://swagger.io/) at http://localhost:3000/api/v1/docs. Or check it out on [live](https://p2p.mirotalk.com/api/v1/docs) & [heroku](https://mirotalk.herokuapp.com/api/v1/docs).
+
+</details>
+
+<details open>
+<summary>Hetzner</summary>
+
+<br/>
+
+[![Hetzner](public/sponsors/Hetzner.png)](https://www.hetzner.com)
+
+This application is running for `demonstration purposes` on [Hetzner](https://www.hetzner.com/), one of `the best` [cloud providers](https://www.hetzner.com/cloud) and [dedicated root servers](https://www.hetzner.com/dedicated-rootserver).
+
+If you need help to deploy `MiroTalk P2P` instance on `your dedicated cloud server`, or for other needs, don't hesitate to contact us at p2p.mirotalk@gmail.com
 
 </details>
 
 <details>
-<summary>Live Demo</summary>
+<summary>Live Demos</summary>
 
 <br/>
 
-<a target="_blank" href="https://railway.app/new/template/mirotalk?referralCode=mirotalk"><img src="https://railway.app/button.svg" style="width: 220px;"></a>
+<a target="_blank" href="https://p2p.mirotalk.com"><img src="public/sponsors/Hetzner.png" style="width: 220px;"></a>
 
-https://mirotalk.up.railway.app/
+https://p2p.mirotalk.com
 
-[![railway-qr](public/images/mirotalk-railway-qr.png)](https://mirotalk.up.railway.app/)
+[![hetzner-qr](public/images/mirotalk-hetzner-qr.png)](https://p2p.mirotalk.com)
 
 <br>
 
-<a target="_blank" href="https://www.heroku.com/"><img src="https://www.herokucdn.com/deploy/button.svg" style="width: 220px;"></a>
+<a target="_blank" href="https://railway.app/new/template/mirotalk?referralCode=mirotalk"><img src="https://railway.app/button.svg" style="width: 220px;"></a>
 
-https://mirotalk.herokuapp.com/
+https://mirotalk.up.railway.app
 
-[![heroku-qr](public/images/mirotalk-heroku-qr.png)](https://mirotalk.herokuapp.com/)
+[![railway-qr](public/images/mirotalk-railway-qr.png)](https://mirotalk.up.railway.app)
+
+<br>
+
+<a href="https://heroku.com/deploy?template=https://github.com/miroslavpejic85/mirotalk"><img src="https://www.herokucdn.com/deploy/button.svg" style="width: 220px;" alt="Heroku Deploy"></a>
+
+https://mirotalk.herokuapp.com
+
+[![heroku-qr](public/images/mirotalk-heroku-qr.png)](https://mirotalk.herokuapp.com)
 
 If you want to deploy a MiroTalk P2P instance on your dedicated server, or for other needs, don't hesitate to contact us at p2p.mirotalk@gmail.com.
+
+</details>
+
+<details>
+<summary>Self Hosting</summary>
+
+<br/>
+
+Follow [this documentation](docs/self-hosting.md).
 
 </details>
 
@@ -251,13 +292,17 @@ For a MiroTalk license under conditions other than AGPLv3, please contact us at 
 </details>
 
 <details open>
-<summary>Sponsors</summary>
+<summary>Support the project</summary>
 
 <br/>
 
-Support this project by [becoming a sponsor](https://github.com/sponsors/miroslavpejic85). Your logo will show up here with a link to your website.
+Do you find MiroTalk useful?
+
+Support the project by [becoming a backer or sponsor](https://github.com/sponsors/miroslavpejic85). Your logo will show up here with a link to your website.
 
 [![BroadcastX](public/sponsors/BroadcastX.png)](https://broadcastx.de/)
+
+[![Hetzner](public/sponsors/Hetzner.png)](https://www.hetzner.com)
 
 </details>
 
