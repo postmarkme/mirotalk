@@ -1,9 +1,9 @@
 /*
  ██████ ██      ██ ███████ ███    ██ ████████ 
 ██      ██      ██ ██      ████   ██    ██    
-██      ██      ██ █████   ██ ██  ██    ██    
-██      ██      ██ ██      ██  ██ ██    ██    
- ██████ ███████ ██ ███████ ██   ████    ██   
+██      ██      ██ █████   ██ ██  ██    ██ 
+██      ██      ██ ██      ██  ██ ██    ██ 
+ ██████ ███████ ██ ███████ ██   ████    ██ 
 */
 
 /**
@@ -812,7 +812,7 @@ function welcomeUser() {
         imageUrl: welcomeImg,
         html:
             `
-        <br/> 
+        <br/>
         <p style="color:white;">Invite others to join. Share this meeting link.</p>
         <p style="color:rgb(8, 189, 89);">` +
             myRoomUrl +
@@ -1927,6 +1927,8 @@ function hideLeftButtons() {
     captionBtn.style.display = 'none';
     myHandBtn.style.display = 'none';
     fileShareBtn.style.display = 'none';
+    recordStreamBtn.style.display = 'none';
+    shareRoomBtn.style.display = 'none';
 }
 
 /**
@@ -2783,7 +2785,7 @@ async function shareRoomUrl() {
             /*
                 This feature is available only in secure contexts (HTTPS),
                 in some or all supporting browsers and mobile devices
-                console.error("navigator.share", err); 
+                console.error("navigator.share", err);
             */
         }
     }
